@@ -20,6 +20,7 @@ bot.setWebHook(`${url}/bot${token}`);
 app.use(express.json());  // Per fare il parse di JSON
 
 app.post(url, (req, res) => {
+  console.log('Messaggio ricevuto:', req.body); // Aggiungi questo log
   const message = req.body.message;
   if (message) {
     const chatId = message.chat.id;
