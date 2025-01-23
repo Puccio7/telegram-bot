@@ -32,13 +32,12 @@ app.get('/', (req, res) => {
 // Assicurati di fare il parse del corpo della richiesta
 app.use(express.json());  // Per fare il parse di JSON
 
-// Gestisce le richieste POST che Telegram invia al webhook
-app.post(`/bot${token}`, (req, res) => {
-  console.log('Ricevuto aggiornamento:', req.body);  // Log per vedere i dati
-  bot.processUpdate(req.body);
-  res.sendStatus(200);  // Rispondi con OK a Telegram per confermare la ricezione
-});
-
+app.post(url, (req, res) => {
+  const message = req.body.message;
+  if (message) {
+    const chatId = message.chat.id;
+    const text = message.text;
+    
 // Avvia il server Express
 app.listen(port, () => {
   console.log(`Server in ascolto sulla porta ${port}`);
