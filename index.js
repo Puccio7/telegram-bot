@@ -1,4 +1,4 @@
-const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = require('node-telegram-bot-api'); 
 require('dotenv').config();
 const express = require('express');
 const app = express();
@@ -8,8 +8,10 @@ const token = process.env.BOT_TOKEN;
 
 // Inizializza il bot
 const bot = new TelegramBot(token);
+
 // Simula l'ascolto su una porta (anche se non serve per Telegram)
 const port = process.env.PORT || 3000;
+
 // L'URL del tuo servizio su Render (usa l'URL che Render ti ha fornito)
 const url = 'https://telegram-bot-oplp.onrender.com';
 
@@ -19,13 +21,14 @@ bot.setWebHook(`${url}/bot${token}`);
 // Assicurati di fare il parse del corpo della richiesta
 app.use(express.json());  // Per fare il parse di JSON
 
-app.post(url, (req, res) => {
+// Gestisci gli aggiornamenti tramite webhook
+app.post(`/bot${token}`, (req, res) => {
   console.log('Messaggio ricevuto:', req.body); // Aggiungi questo log
   const message = req.body.message;
   if (message) {
     const chatId = message.chat.id;
     const text = message.text;
-        // Rispondi a un messaggio
+    // Rispondi a un messaggio
     bot.sendMessage(chatId, `Hai scritto: ${text}`);
   }
   res.sendStatus(200); // Rispondi a Telegram con uno status di successo
