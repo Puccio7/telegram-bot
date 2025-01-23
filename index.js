@@ -1,14 +1,14 @@
-require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
+require('dotenv').config();
 
 // Leggi il token dal file .env
 const token = process.env.BOT_TOKEN;
 
-// L'URL del tuo servizio su Render (usa l'URL che Render ti ha fornito)
-const url = 'https://telegram-bot-oplp.onrender.com';
-
 // Inizializza il bot
 const bot = new TelegramBot(token);
+
+// L'URL del tuo servizio su Render (usa l'URL che Render ti ha fornito)
+const url = 'https://telegram-bot-oplp.onrender.com';
 
 // Imposta il nuovo webhook
 bot.setWebHook(`${url}/bot${token}`);
