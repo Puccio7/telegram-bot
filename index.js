@@ -7,6 +7,9 @@ const token = process.env.BOT_TOKEN;
 // Inizializza il bot con polling
 const bot = new TelegramBot(token, { polling: true });
 
+// Assicurati che il webhook non venga mai usato
+bot.setWebHook(""); // Disabilita qualsiasi webhook esistente
+
 // Simula l'ascolto su una porta (anche se non serve per Telegram)
 const port = process.env.PORT || 3000;
 const express = require('express');
