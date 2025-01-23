@@ -1,31 +1,46 @@
-const TelegramBot = require('node-telegram-bot-api');
-require('dotenv').config();
+// Funzione che gestisce i comandi del bot
+function setupCommands(bot) {
+  // Comando /start che invia una tastiera inline
+  bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+    const options = {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: 'Opzione 1', callback_data: 'opzione1' },
+            { text: 'Opzione 2', callback_data: 'opzione2' },
+          ],
+          [
+            { text: 'Opzione 3', callback_data: 'opzione3' }
+          ]
+        ]
+      }
+    };
+    
+    // Invia il messaggio con la tastiera inline
+    bot.sendMessage(chatId, 'Scegli una delle opzioni:', options);
+  });
 
-// Leggi il token dal file .env
-const token = process.env.BOT_TOKEN;
+  // Gestione dei bottoni cliccati
+  bot.on('callback_query', (callbackQuery) => {
+    const chatId = callbackQuery.message.chat.id;
+    const data = callbackQuery.data; // Dati inviati con il bottone
 
-// Inizializza il bot
-const bot = new TelegramBot(token);
+    if (data === 'opzione1') {
+      bot.sendMessage(chatId, 'Hai scelto l\'Opzione 1!');
+    } else if (data === 'opzione2') {
+      bot.sendMessage(chatId, 'Hai scelto l\'Opzione 2!');
+    } else if (data === 'opzione3') {
+      bot.sendMessage(chatId, 'Hai scelto l\'Opzione 3!');
+    }
+  });
 
+  // Altri comandi che vuoi aggiungere
+  bot.onText(/\/help/, (msg) => {
+    const chatId = msg.chat.id;
+    bot.sendMessage(chatId, 'Ecco i comandi disponibili:\n/start per iniziare\n/help per la guida');
+  });
+}
 
-// Risposta al comando /start
-bot.onText(/\/start/, (msg) => {
-  const chatId = msg.chat.id;
-  const userName = msg.from.first_name || "Utente";  // Ottieni il nome dell'utente
-  bot.sendMessage(chatId, `Ciao ${userName}, benvenuto nel bot!`);
-});
-
-// Risposta a qualsiasi altro messaggio
-bot.on('message', (msg) => {
-  const chatId = msg.chat.id;
-  const text = msg.text.toLowerCase();  // Converti il messaggio in minuscolo
-
-  if (text.includes("ciao")) {
-    bot.sendMessage(chatId, "Ciao! Come posso aiutarti?");  // Risponde al messaggio che contiene "ciao"
-  } else if (text.includes("episodi")) {
-    bot.sendMessage(chatId, "Ecco gli episodi: Episodio 1, Episodio 2, Episodio 3");  // Risponde se il messaggio contiene "episodi"
-  } else {
-    bot.sendMessage(chatId, "Non sono sicuro di cosa intendi, ma se hai bisogno di aiuto prova a usare /start.");
-  }
-});
-
+// Esportiamo la funzione per essere usata in index.js
+module.exports = { setupCommands };
