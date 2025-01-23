@@ -1,12 +1,28 @@
 require('dotenv').config();
-const port = process.env.PORT || 4000;
 const TelegramBot = require('node-telegram-bot-api');
 
-// Inserisci il tuo token qui
+// Leggi il token dal file .env
 const token = process.env.BOT_TOKEN;
 
+// Inizializza il bot con polling
 const bot = new TelegramBot(token, { polling: true });
 
+// Simula l'ascolto su una porta (anche se non serve per Telegram)
+const port = process.env.PORT || 3000;
+const express = require('express');
+const app = express();
+
+// Telegram bot logica
 bot.on('message', (msg) => {
   bot.sendMessage(msg.chat.id, `Ciao ${msg.from.first_name}, hai scritto: "${msg.text}"`);
+});
+
+// Aggiungi un endpoint "di controllo" per Render
+app.get('/', (req, res) => {
+  res.send('Il bot Telegram è attivo!');
+});
+
+// Avvia il server Express
+app.listen(port, () => {
+  console.log(`Server in ascolto sulla porta ${port}`);
 });
