@@ -31,8 +31,12 @@ app.get('/', (req, res) => {
   res.send('Il bot Telegram è attivo!');
 });
 
+// Assicurati di fare il parse del corpo della richiesta
+app.use(express.json());  // Per fare il parse di JSON
+
 // Gestisce le richieste POST che Telegram invia al webhook
 app.post(`/bot${token}`, (req, res) => {
+  console.log('Ricevuto aggiornamento:', req.body);  // Log per vedere i dati
   bot.processUpdate(req.body);
   res.sendStatus(200);  // Rispondi con OK a Telegram per confermare la ricezione
 });
