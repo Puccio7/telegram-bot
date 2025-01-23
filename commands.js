@@ -1,3 +1,6 @@
+const TelegramBot = require('node-telegram-bot-api');
+require('dotenv').config();
+
 // Leggi il token dal file .env
 const token = process.env.BOT_TOKEN;
 
