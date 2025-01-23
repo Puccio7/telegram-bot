@@ -10,9 +10,6 @@ const url = 'https://telegram-bot-oplp.onrender.com';
 // Inizializza il bot
 const bot = new TelegramBot(token);
 
-// Assicurati che il webhook non venga mai usato
-bot.setWebHook(""); // Disabilita qualsiasi webhook esistente
-
 // Imposta il nuovo webhook
 bot.setWebHook(`${url}/bot${token}`);
 
