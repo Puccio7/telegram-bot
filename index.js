@@ -1,4 +1,5 @@
 require('dotenv').config();
+const port = process.env.PORT || 4000;
 const TelegramBot = require('node-telegram-bot-api');
 
 // Inserisci il tuo token qui
