@@ -1,3 +1,10 @@
+// Leggi il token dal file .env
+const token = process.env.BOT_TOKEN;
+
+// Inizializza il bot
+const bot = new TelegramBot(token);
+
+
 // Risposta al comando /start
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
