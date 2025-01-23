@@ -31,6 +31,12 @@ app.get('/', (req, res) => {
   res.send('Il bot Telegram è attivo!');
 });
 
+// Gestisce le richieste POST che Telegram invia al webhook
+app.post(`/bot${token}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);  // Rispondi con OK a Telegram per confermare la ricezione
+});
+
 // Avvia il server Express
 app.listen(port, () => {
   console.log(`Server in ascolto sulla porta ${port}`);
