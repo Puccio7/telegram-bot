@@ -13,13 +13,11 @@ const url = 'https://telegram-bot-oplp.onrender.com';
 // Imposta il nuovo webhook
 bot.setWebHook(`${url}/bot${token}`);
 
-// Importa le funzioni di gestione dei comandi
-const { handleStart, handleEpisodi, handleCustomMessages } = require('./commands');
+// Importa i comandi dal file command.js
+const { setupCommands } = require('./command');
 
-// Gestisci i comandi
-handleStart(bot);
-handleEpisodi(bot);
-handleCustomMessages(bot);
+// Avvia i comandi per il bot
+setupCommands(bot);
 
 // Simula l'ascolto su una porta (anche se non serve per Telegram)
 const port = process.env.PORT || 3000;
