@@ -5,7 +5,7 @@ const app = express();
 
 // Leggi il token dal file .env
 const token = process.env.BOT_TOKEN;
-
+const port = process.env.PORT || 3000;
 // Inizializza il bot
 const bot = new TelegramBot(token);
 
