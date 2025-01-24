@@ -9,9 +9,6 @@ const token = process.env.BOT_TOKEN;
 // Inizializza il bot
 const bot = new TelegramBot(token);
 
-// Simula l'ascolto su una porta (anche se non serve per Telegram)
-const port = process.env.PORT || 5000;
-
 // L'URL del tuo servizio su Render (usa l'URL che Render ti ha fornito)
 const url = process.env.WEBHOOK_URL;
 
