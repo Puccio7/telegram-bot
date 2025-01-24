@@ -35,6 +35,22 @@ function setupCommands(bot) {
     }
   });
 
+  bot.onText(/\/comandi/, (msg) => {
+  const chatId = msg.chat.id;
+  const options = {
+    reply_markup: {
+      keyboard: [
+        [{ text: 'Comando 1' }, { text: 'Comando 2' }],
+        [{ text: 'Comando 3' }],
+      ],
+      resize_keyboard: true,
+      one_time_keyboard: true,
+    },
+  };
+
+  bot.sendMessage(chatId, 'Scegli un comando:', options);
+});
+  
   // Altri comandi che vuoi aggiungere
   bot.onText(/\/help/, (msg) => {
     const chatId = msg.chat.id;
