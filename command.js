@@ -29,16 +29,29 @@ const generateSeasonsKeyboard = () => {
 // Funzione per generare la tastiera degli episodi
 const generateEpisodesKeyboard = (season) => {
   const episodes = seasonsEpisodes[season];
+  const keyboard = [];
+  for (let i = 0; i < episodes.length; i += 3) {
+    const row = episodes.slice(i, i + 3).map((ep) => ({
+      text: ep.title,
+      url: ep.url,
+    }));
+    keyboard.push(row);
+  }
+  keyboard.push([{ text: "Indietro", callback_data: `indietro_stagioni` }]);
   return {
     reply_markup: {
-      inline_keyboard: [
-        ...episodes.map((ep) => [
-          { text: ep.title, url: ep.url },
-        ]),
-        [{ text: "Indietro", callback_data: `indietro_stagioni` }],
-      ],
+      inline_keyboard: keyboard,
     },
   };
+};
+
+// Funzione per inviare un messaggio di saluto (riutilizzabile)
+const sendGreetingMessage = async (bot, chatId, name) => {
+  await bot.sendMessage(
+    chatId,
+    `Bentornato/a ${name}! Ecco il menu principale. Scegli un'opzione:`,
+    mainMenuKeyboard
+  );
 };
 
 // Comandi principali
@@ -46,11 +59,7 @@ const setupCommands = (bot) => {
   bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
     const name = msg.from.first_name || msg.from.username || "Utente";
-    bot.sendMessage(
-      chatId,
-      `Ciao ${name}, benvenuto/a! Scegli un'opzione dal menu principale.`,
-      mainMenuKeyboard
-    );
+    sendGreetingMessage(bot, chatId, name);
   });
 
   bot.on("callback_query", async (callbackQuery) => {
@@ -63,7 +72,7 @@ const setupCommands = (bot) => {
 
     // Gestione "Stagioni"
     if (data === "stagioni") {
-      await bot.sendMessage(chatId, "Seleziona una stagione:", generateSeasonsKeyboard());
+      await bot.sendMessage(chatId, "Seleziona la stagione che vuoi vedere:", generateSeasonsKeyboard());
     }
 
     // Gestione specifica stagione
@@ -84,7 +93,7 @@ const setupCommands = (bot) => {
     if (data === "aiuto") {
       await bot.sendMessage(
         chatId,
-        "Per usare questo bot:\n\n1. Premi 'Stagioni' per esplorare le stagioni e i loro episodi.\n2. Premi sugli episodi per accedere ai link.\n\nPremi 'Indietro' per tornare al menu principale.",
+        "Tramite questo bot puoi guardare le stagioni di MC Italia. Come? Così: \n\n1. Premi 'Stagioni' per esplorare le stagioni.\n2. Premi sull'episodio per accedere ai link.\n\nOppure premi 'Indietro' per tornare al menu principale.",
         {
           reply_markup: {
             inline_keyboard: [[{ text: "Indietro", callback_data: "indietro_main" }]],
@@ -96,11 +105,7 @@ const setupCommands = (bot) => {
     // Gestione "Indietro"
     if (data === "indietro_main") {
       const name = callbackQuery.from.first_name || callbackQuery.from.username || "Utente";
-      await bot.sendMessage(
-        chatId,
-        `Bentornato/a ${name}! Ecco il menu principale. Scegli un'opzione:`,
-        mainMenuKeyboard
-      );
+      sendGreetingMessage(bot, chatId, name);
     }
 
     if (data === "indietro_stagioni") {
