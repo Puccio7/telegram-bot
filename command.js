@@ -1,62 +1,112 @@
-// Funzione che gestisce i comandi del bot
-function setupCommands(bot) {
-  // Comando /start che invia una tastiera inline
-  bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    const options = {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            { text: 'Opzione 1', callback_data: 'opzione1' },
-            { text: 'Opzione 2', callback_data: 'opzione2' },
-          ],
-          [
-            { text: 'Opzione 3', callback_data: 'opzione3' }
-          ]
-        ]
-      }
-    };
-    
-    // Invia il messaggio con la tastiera inline
-    bot.sendMessage(chatId, 'Scegli una delle opzioni:', options);
-  });
+const TelegramBot = require("node-telegram-bot-api");
+const { seasonsEpisodes } = require("./seasonsEpisodes");
 
-  // Gestione dei bottoni cliccati
-  bot.on('callback_query', (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const data = callbackQuery.data; // Dati inviati con il bottone
+// Configurazione tastiera principale
+const mainMenuKeyboard = {
+  reply_markup: {
+    inline_keyboard: [
+      [{ text: "Stagioni", callback_data: "stagioni" }],
+      [{ text: "Aiuto", callback_data: "aiuto" }],
+    ],
+  },
+};
 
-    if (data === 'opzione1') {
-      bot.sendMessage(chatId, 'Hai scelto l\'Opzione 1!');
-    } else if (data === 'opzione2') {
-      bot.sendMessage(chatId, 'Hai scelto l\'Opzione 2!');
-    } else if (data === 'opzione3') {
-      bot.sendMessage(chatId, 'Hai scelto l\'Opzione 3!');
-    }
-  });
-
-  bot.onText(/\/comandi/, (msg) => {
-  const chatId = msg.chat.id;
-  const options = {
+// Funzione per generare la tastiera delle stagioni
+const generateSeasonsKeyboard = () => {
+  const seasons = Object.keys(seasonsEpisodes);
+  return {
     reply_markup: {
-      keyboard: [
-        [{ text: 'Comando 1' }, { text: 'Comando 2' }],
-        [{ text: 'Comando 3' }],
+      inline_keyboard: [
+        ...seasons.map((season) => [
+          { text: `Stagione ${season}`, callback_data: `season_${season}` },
+        ]),
+        [{ text: "Indietro", callback_data: "indietro_main" }],
       ],
-      resize_keyboard: true,
-      one_time_keyboard: true,
     },
   };
+};
 
-  bot.sendMessage(chatId, 'Scegli un comando:', options);
-});
-  
-  // Altri comandi che vuoi aggiungere
-  bot.onText(/\/help/, (msg) => {
+// Funzione per generare la tastiera degli episodi
+const generateEpisodesKeyboard = (season) => {
+  const episodes = seasonsEpisodes[season];
+  return {
+    reply_markup: {
+      inline_keyboard: [
+        ...episodes.map((ep) => [
+          { text: ep.title, url: ep.url },
+        ]),
+        [{ text: "Indietro", callback_data: `indietro_stagioni` }],
+      ],
+    },
+  };
+};
+
+// Comandi principali
+const setupCommands = (bot) => {
+  bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    bot.sendMessage(chatId, 'Ecco i comandi disponibili:\n/start per iniziare\n/help per la guida');
+    const name = msg.from.first_name || msg.from.username || "Utente";
+    bot.sendMessage(
+      chatId,
+      `Ciao ${name}, benvenuto/a! Scegli un'opzione dal menu principale.`,
+      mainMenuKeyboard
+    );
   });
-}
 
-// Esportiamo la funzione per essere usata in index.js
+  bot.on("callback_query", async (callbackQuery) => {
+    const chatId = callbackQuery.message.chat.id;
+    const messageId = callbackQuery.message.message_id;
+    const data = callbackQuery.data;
+
+    // Elimina il messaggio precedente
+    await bot.deleteMessage(chatId, messageId);
+
+    // Gestione "Stagioni"
+    if (data === "stagioni") {
+      await bot.sendMessage(chatId, "Seleziona una stagione:", generateSeasonsKeyboard());
+    }
+
+    // Gestione specifica stagione
+    if (data.startsWith("season_")) {
+      const season = data.split("_")[1];
+      if (seasonsEpisodes[season]) {
+        await bot.sendMessage(
+          chatId,
+          `Ecco gli episodi della Stagione ${season}:`,
+          generateEpisodesKeyboard(season)
+        );
+      } else {
+        await bot.sendMessage(chatId, "Stagione non trovata.");
+      }
+    }
+
+    // Gestione "Aiuto"
+    if (data === "aiuto") {
+      await bot.sendMessage(
+        chatId,
+        "Per usare questo bot:\n\n1. Premi 'Stagioni' per esplorare le stagioni e i loro episodi.\n2. Premi sugli episodi per accedere ai link.\n\nPremi 'Indietro' per tornare al menu principale.",
+        {
+          reply_markup: {
+            inline_keyboard: [[{ text: "Indietro", callback_data: "indietro_main" }]],
+          },
+        }
+      );
+    }
+
+    // Gestione "Indietro"
+    if (data === "indietro_main") {
+      const name = callbackQuery.from.first_name || callbackQuery.from.username || "Utente";
+      await bot.sendMessage(
+        chatId,
+        `Bentornato/a ${name}! Ecco il menu principale. Scegli un'opzione:`,
+        mainMenuKeyboard
+      );
+    }
+
+    if (data === "indietro_stagioni") {
+      await bot.sendMessage(chatId, "Seleziona una stagione:", generateSeasonsKeyboard());
+    }
+  });
+};
+
 module.exports = { setupCommands };
