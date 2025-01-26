@@ -1,3 +1,5 @@
+const TelegramBot = require("node-telegram-bot-api");
+
 const generateEpisodes = (season, episodes) => {
   const baseUrl = "https://streamingcommunity.paris/watch/1955?e=";
   return episodes.map((episodeId, index) => ({
@@ -9,14 +11,34 @@ const generateEpisodes = (season, episodes) => {
 
 const seasonsEpisodes = {
   "1": generateEpisodes(1, [
-    12345, 12346, 12347, // Numeri finali per gli episodi della stagione 1
+    16962, 16963, 16964, 16965, 16966, 16967, 16968, 16969, 16970, 16971, 16972, 16973, 16974, 16975, 16976, 16977, 16978, 16979, 16980, 16981, 16982, 16983, 16984, 16985// Numeri finali per gli episodi della stagione 1
   ]),
   "2": generateEpisodes(2, [
-    22345, 22346, 22347, // Numeri finali per gli episodi della stagione 2
+    16986, 16987, 16988, 16989, 16990, 16991, 16992, 16993, 16994, 16995, 16996, 16997, 16998, 16999, 17000, 17001, 17002, 17003, 17004, 17005, 17006, 17007, 17008// Numeri finali per gli episodi della stagione 2
+  ]),
+    "3": generateEpisodes(3, [
+    17009, 17010, 17011, 17012, 17013, 17014, 17015, 17016, 17017, 17018, 17019, 17020, 17021, 17022, 17023, 17024, 17025, 17026, 17027, 17028, 17029, 17030, 17031, 17032// Numeri finali per gli episodi della stagione 2
   ]),
   "14": generateEpisodes(14, [
-    84210, 84211, 84212, 84213, 84214, 84215, 84216, 84217, // Numeri finali per gli episodi della stagione 14
+    82347, 82376, 82702, 82750, 83189, 83190, 83325, 83326, 83548, 83549, 84116, 84117, 84215, 84217// Numeri finali per gli episodi della stagione 14
   ]),
 };
 
-module.exports = { seasonsEpisodes };
+// Funzione per generare la tastiera con più episodi per riga
+const generateInlineKeyboard = (season) => {
+  const episodes = seasonsEpisodes[season];
+  if (!episodes) return [];
+
+  // Raggruppa gli episodi in righe di 3
+  const keyboard = [];
+  for (let i = 0; i < episodes.length; i += 3) {
+    const row = episodes.slice(i, i + 3).map((ep) => ({
+      text: ep.title,
+      callback_data: `episode_${season}_${ep.episode}`, // Identifica univocamente l'episodio
+    }));
+    keyboard.push(row);
+  }
+  return keyboard;
+};
+
+module.exports = { seasonsEpisodes, generateInlineKeyboard };
